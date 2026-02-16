@@ -5,5 +5,10 @@
   "features": {
     "chat": false,
     "ideas": false
+  },
+  "labels": {
+    "btn_open_chat": "Abrir Chat",
+    "btn_close_chat": "Cerrar Chat",
+    "btn_process_ideas": "Procesar Ideas"
   }
 }

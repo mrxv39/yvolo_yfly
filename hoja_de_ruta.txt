@@ -12,10 +12,20 @@
   - Confirmar que toda la UI y labels serán en español
   - Añadir README.md corto explicando el objetivo (solo ES por ahora)
   - Añadir estructura mínima para configuración futura (por ejemplo: carpeta config/ con settings.py o settings.json)
-  Archivos: README.md, config/settings.json (o settings.py)
+  Archivos: README.md, config/settings.json
   Critica: Critica
   Implementada: Implementada
   Dependencias: Tarea 1
+
+- Descripción: Conectar config/settings.json a la UI:
+  - Leer config/settings.json al iniciar
+  - Usar app_name para el título de la ventana
+  - Usar labels desde config (botones)
+  - Fallback si falta config o JSON inválido (con WARN en consola)
+  Archivos: ui_main.py, config/settings.json, tests/test_ui_main.py
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Tarea 2
 
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
@@ -24,5 +34,5 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_YYYYMMDD_HHMMSS.zip
+backup: Desktop\backups\backup_yvolo_20260216_093432.zip
 --------------------------------------------------
