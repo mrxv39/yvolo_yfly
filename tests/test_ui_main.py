@@ -116,9 +116,9 @@ class TestYvoloApp(unittest.TestCase):
 
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
-        cmd = args[0]  # list like ["powershell","-Command","Set-Clipboard -Path ..."]
+        cmd = args[0]  # list like ["powershell","-Command","SetFileDropList -Path ..."]
         self.assertIn("powershell", cmd[0].lower())
-        self.assertIn("Set-Clipboard", cmd[-1])
+        self.assertIn("SetFileDropList", cmd[-1])
         self.assertIn(existing_file, cmd[-1])
         self.assertIn(hoja_path, cmd[-1])
         self.assertIn(promp_path, cmd[-1])
@@ -142,7 +142,7 @@ class TestYvoloApp(unittest.TestCase):
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
-        self.assertIn("Set-Clipboard", cmd[-1])
+        self.assertIn("SetFileDropList", cmd[-1])
         self.assertIn(hoja_path, cmd[-1])
         self.assertNotIn(r"C:\no\such\file.zip", cmd[-1])
 

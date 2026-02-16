@@ -40,6 +40,19 @@
   Implementada: Implementada
   Dependencias: Tarea 3
 
+- Descripción: Fix "Abrir Chat" para copiar ARCHIVOS (FileDropList real) en vez de contenido:
+  - Reemplazar Set-Clipboard -Path por [System.Windows.Forms.Clipboard]::SetFileDropList
+  - Debe copiar exactamente estos 3 archivos:
+    1) último backup .zip (desde línea backup: en hoja_de_ruta.txt)
+    2) hoja_de_ruta.txt
+    3) promp_maestro.txt
+  - Si alguno no existe: WARN y copiar los existentes
+  - Tests: no tocar portapapeles real; validar que el PowerShell command contiene SetFileDropList y las rutas esperadas
+  Archivos: ui_main.py, tests/test_ui_main.py
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Tarea 4
+
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
@@ -47,5 +60,5 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_115825.zip
+backup: Desktop\backups\backup_yvolo_20260216_121154.zip
 --------------------------------------------------

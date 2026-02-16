@@ -1,4 +1,4 @@
-import tkinter as tk
+port tkinter as tk
 import json
 import os
 
@@ -78,13 +78,17 @@ class YvoloApp(tk.Tk):
         if not existing:
             print("WARN: No files to copy")
             return
-        # PowerShell Set-Clipboard -Path ...
+        # PowerShell script for SetFileDropList
         try:
-            cmd = [
-                "powershell",
-                "-Command",
-                "Set-Clipboard -Path {}".format(','.join(f'\"{p}\"' for p in existing))
+            script_lines = [
+                "Add-Type -AssemblyName System.Windows.Forms;",
+                "$sc = New-Object System.Collections.Specialized.StringCollection;"
             ]
+            for p in existing:
+                script_lines.append(f"$sc.Add('{p}');")
+            script_lines.append("[System.Windows.Forms.Clipboard]::SetFileDropList($sc);")
+            script = ' '.join(script_lines)
+            cmd = ["powershell", "-Command", script]
             subprocess.run(cmd, check=True)
             print("Archivos copiados al portapapeles")
         except Exception as e:
