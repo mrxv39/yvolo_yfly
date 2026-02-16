@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+tests/__pycache__/
+backup_proyecto.zip
+promp_maestro.txt
