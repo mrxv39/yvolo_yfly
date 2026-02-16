@@ -1,0 +1,9 @@
+{
+  "app_name": "yvolo",
+  "language": "es",
+  "version": "0.1.0",
+  "features": {
+    "chat": false,
+    "ideas": false
+  }
+}

@@ -8,12 +8,21 @@
   Implementada: Implementada
   Dependencias: Ninguna
 
+- Descripción: Definir alcance SOLO yvolo (ES) y preparar base para crecimiento sin implementar yfly:
+  - Confirmar que toda la UI y labels serán en español
+  - Añadir README.md corto explicando el objetivo (solo ES por ahora)
+  - Añadir estructura mínima para configuración futura (por ejemplo: carpeta config/ con settings.py o settings.json)
+  Archivos: README.md, config/settings.json (o settings.py)
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Tarea 1
+
 #Ideas
-Crear futura versión multi-idioma yvolo/yfly
+- Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
 #ProyectoInfo
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_000000.zip
+backup: Desktop\backups\backup_yvolo_YYYYMMDD_HHMMSS.zip
 --------------------------------------------------
