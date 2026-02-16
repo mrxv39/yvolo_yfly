@@ -83,7 +83,7 @@
 --------------------------------------------------
 #ProyectoInfo
 
-repo_git: <URL_DEL_REPOSITORIO>
+repo_git: https://github.com/mrxv39/yvolo_yfly.git
 name_project: yvolo
 backup: Desktop\backups\backup_yvolo_20260216_131415.zip
 --------------------------------------------------

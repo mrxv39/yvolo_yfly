@@ -2,10 +2,7 @@
   "app_name": "yvolo",
   "language": "es",
   "version": "0.1.0",
-  "features": {
-    "chat": false,
-    "ideas": false
-  },
+  "features": {},
   "labels": {
     "btn_open_chat": "Abrir Chat",
     "btn_close_chat": "Cerrar Chat",
