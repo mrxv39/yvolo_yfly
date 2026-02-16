@@ -70,6 +70,14 @@
   Implementada: Implementada
   Dependencias: Ninguna
 
+- Descripción: Actualizar el prompt estricto a v7:
+  - Reemplazar promp_maestro_strict_mode_v6.txt por promp_maestro_strict_mode_v7.txt (v6 eliminado, v7 agregado)
+  - Asegurar que el repositorio refleje v7 como prompt estricto activo
+  Archivos: promp_maestro_strict_mode_v7.txt, promp_maestro_strict_mode_v6.txt
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Ninguna
+
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
@@ -77,7 +85,7 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_130909.zip
+backup: Desktop\backups\backup_yvolo_20260216_131415.zip
 --------------------------------------------------
 
 
