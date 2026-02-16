@@ -63,6 +63,13 @@
   Implementada: Implementada
   Dependencias: Tarea 5
 
+- Descripción: Crear un archivo .bat para ejecutar la UI de Tkinter sin mostrar ventana de consola:
+  - El .bat debe lanzar la aplicación de forma que no quede ninguna terminal visible
+  Archivos: run_yvolo_ui.bat
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Ninguna
+
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
@@ -70,7 +77,7 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_125254.zip
+backup: Desktop\backups\backup_yvolo_20260216_130909.zip
 --------------------------------------------------
 
 
