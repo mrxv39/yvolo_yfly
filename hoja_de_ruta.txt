@@ -1,0 +1,19 @@
+#Tareas
+- Descripción: Crear UI básica en Tkinter con tres botones:
+  - Abrir Chat
+  - Cerrar Chat
+  - Procesar Ideas
+  Archivo principal: ui_main.py
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Ninguna
+
+#Ideas
+Crear futura versión multi-idioma yvolo/yfly
+--------------------------------------------------
+#ProyectoInfo
+
+repo_git: <URL_DEL_REPOSITORIO>
+name_project: yvolo
+backup: Desktop\backups\backup_yvolo_20260216_000000.zip
+--------------------------------------------------
