@@ -1,8 +1,18 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-tests/__pycache__/
-backup_proyecto.zip
-promp_maestro.txt
-.vscode/
+
+# Virtual env
+.venv/
+venv/
+
+# PyInstaller
+build/
+dist/
+*.spec
+
+# OS
+.DS_Store
+Thumbs.db

@@ -79,6 +79,16 @@
   Dependencias: Ninguna
 
 #Ideas
+- Descripción: Nuevo Proyecto v1 (plantillas + repo + tareas iniciales)
+  - Al crear un nuevo proyecto, el archivo promp_maestro.txt generado DEBE ser idéntico al prompt maestro estricto V7 de yvolo (el contenido actual de yvolo/promp_maestro.txt).
+  - El archivo hoja_de_ruta.txt generado DEBE seguir la misma estructura y reglas que el hoja_de_ruta.txt de yvolo (secciones #Tareas, #Ideas y el bloque delimitador final #ProyectoInfo sin nada debajo).
+  - Durante la creación del proyecto, si el nuevo proyecto no tiene un repositorio git inicializado, inicializarlo.
+  - Si no hay un repositorio remoto configurado, intentar crear y enlazar un repositorio remoto de GitHub automáticamente si el CLI de GitHub (gh) está disponible y autenticado; si no, mostrar un WARN en el estado de la UI.
+  - El diálogo de Nuevo Proyecto debe pedir: nombre del proyecto + una breve descripción de lo que se quiere construir, para generar una lista inicial de tareas en el hoja_de_ruta.txt del nuevo proyecto (cada línea se convierte en una tarea con Critica: No critica, Implementada: No implementada, Dependencias: Ninguna).
+  Archivos: ui_main.py, promp_maestro.txt, hoja_de_ruta.txt
+  Critica: Critica
+  Implementada: No implementada
+  Dependencias: Ninguna
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
 #ProyectoInfo

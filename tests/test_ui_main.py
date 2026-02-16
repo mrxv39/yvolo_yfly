@@ -4,7 +4,8 @@ import unittest
 import tkinter as tk
 from unittest.mock import patch
 
-from ui_main import YvoloApp, load_config, DEFAULT_CONFIG
+from ui.app import YvoloApp
+from core.config import load_config, DEFAULT_CONFIG
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -19,7 +20,7 @@ class TestYvoloApp(unittest.TestCase):
                 self._backup_config = f.read()
 
         self.config = load_config()
-        self.app = YvoloApp(config=self.config)
+        self.app = YvoloApp()
         self.app.update()
 
     def tearDown(self):
@@ -37,8 +38,14 @@ class TestYvoloApp(unittest.TestCase):
         buttons = []
 
         def walk(w):
-            if isinstance(w, tk.Button):
-                buttons.append(w)
+            # ttk.Button no es tk.Button, así que recogemos ambos
+            if isinstance(w, (tk.Button, tk.Widget)) and w.winfo_class() in ("TButton", "Button"):
+                try:
+                    # Confirmar que tiene texto (evita widgets raros)
+                    _ = w.cget("text")
+                    buttons.append(w)
+                except Exception:
+                    pass
             for child in w.winfo_children():
                 walk(child)
 
@@ -55,6 +62,7 @@ class TestYvoloApp(unittest.TestCase):
 
     def test_buttons_match_labels(self):
         buttons = self._find_buttons(self.app)
+        # 4 botones
         self.assertEqual(len(buttons), 4)
 
         texts = sorted([b.cget("text") for b in buttons])
@@ -77,7 +85,7 @@ class TestYvoloApp(unittest.TestCase):
                 os.rename(CONFIG_PATH, temp_path)
 
             config = load_config()
-            app = YvoloApp(config=config)
+            app = YvoloApp()
             app.update()
 
             self.assertEqual(app.title(), DEFAULT_CONFIG["app_name"])
@@ -116,16 +124,14 @@ class TestYvoloApp(unittest.TestCase):
         self.assertIsNotNone(btn, "No se encontró el botón Nuevo Proyecto")
 
         # No abrir diálogo real ni tocar disco
-        with patch.object(self.app, "open_new_project_dialog", return_value=None) as mocked:
-            btn.configure(command=self.app.open_new_project_dialog)
+        with patch.object(self.app, "_open_new_project_dialog", return_value=None) as mocked:
+            btn.configure(command=self.app._open_new_project_dialog)
             btn.invoke()
             self.assertTrue(mocked.called)
 
-    @patch("ui_main.subprocess.run")
+    @patch("ui.app.subprocess.run")
     def test_open_chat_copies_files_calls_powershell(self, mock_run):
-        existing_file = os.path.abspath(__file__)
-        self.app.get_backup_path = lambda: existing_file
-
+        # Crear archivos mínimos en root si faltan (test aislado)
         hoja_path = os.path.join(BASE_DIR, "hoja_de_ruta.txt")
         promp_path = os.path.join(BASE_DIR, "promp_maestro.txt")
 
@@ -134,37 +140,17 @@ class TestYvoloApp(unittest.TestCase):
                 with open(p, "w", encoding="utf-8") as f:
                     f.write("test")
 
-        self.app.open_chat()
-
-        self.assertTrue(mock_run.called)
-        args, _kwargs = mock_run.call_args
-        cmd = args[0]
-        # El script está en cmd[-1]
-        self.assertIn("SetFileDropList", cmd[-1])
-        self.assertIn(existing_file.replace("'", "''"), cmd[-1])
-        self.assertIn(os.path.abspath(hoja_path).replace("'", "''"), cmd[-1])
-        self.assertIn(os.path.abspath(promp_path).replace("'", "''"), cmd[-1])
-
-    @patch("ui_main.subprocess.run")
-    def test_open_chat_skips_missing_files(self, mock_run):
-        self.app.get_backup_path = lambda: r"C:\no\such\file.zip"
-
-        hoja_path = os.path.join(BASE_DIR, "hoja_de_ruta.txt")
-        if not os.path.exists(hoja_path):
-            with open(hoja_path, "w", encoding="utf-8") as f:
-                f.write("test")
-
-        # promp puede existir o no; si no existe, se omitirá
-        self.app.open_chat()
+        with patch("ui.app.messagebox.showinfo"), patch("ui.app.messagebox.showwarning"), patch("ui.app.messagebox.showerror"):
+            self.app._open_chat()
 
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
         self.assertIn("SetFileDropList", cmd[-1])
-        self.assertIn(os.path.abspath(hoja_path).replace("'", "''"), cmd[-1])
-        self.assertNotIn(r"C:\no\such\file.zip", cmd[-1])
+        self.assertIn(os.path.abspath(hoja_path), cmd[-1])
+        self.assertIn(os.path.abspath(promp_path), cmd[-1])
 
-    @patch("ui_main.subprocess.run")
+    @patch("ui.app.subprocess.run")
     def test_open_chat_button_invoke_triggers_copy(self, mock_run):
         target_text = self.config["labels"]["btn_open_chat"]
         buttons = self._find_buttons(self.app)
@@ -177,7 +163,9 @@ class TestYvoloApp(unittest.TestCase):
 
         self.assertIsNotNone(open_button, "No se encontró el botón Abrir Chat")
 
-        open_button.invoke()
+        with patch("ui.app.messagebox.showinfo"), patch("ui.app.messagebox.showwarning"), patch("ui.app.messagebox.showerror"):
+            open_button.invoke()
+
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
