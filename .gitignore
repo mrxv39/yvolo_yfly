@@ -5,3 +5,4 @@ __pycache__/
 tests/__pycache__/
 backup_proyecto.zip
 promp_maestro.txt
+.vscode/
