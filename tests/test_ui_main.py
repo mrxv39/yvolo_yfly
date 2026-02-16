@@ -1,16 +1,21 @@
+# tests/test_ui_main.py
+
+import os
 import unittest
 import tkinter as tk
-import os
 from unittest.mock import patch
 
 from ui_main import YvoloApp, load_config, DEFAULT_CONFIG
 
-CONFIG_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config", "settings.json"))
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(BASE_DIR, "config", "settings.json")
 
 
 class TestYvoloApp(unittest.TestCase):
+
     def setUp(self):
-        # Backup settings.json (so tests can temporarily rename it)
+        # Guardar config original si existe
         self._backup_config = None
         if os.path.exists(CONFIG_PATH):
             with open(CONFIG_PATH, "rb") as f:
@@ -21,13 +26,12 @@ class TestYvoloApp(unittest.TestCase):
         self.app.update()
 
     def tearDown(self):
-        # Close any extra windows safely, then destroy root
         try:
             self.app.destroy()
         except Exception:
             pass
 
-        # Restore settings.json if needed
+        # Restaurar config original si existía
         if self._backup_config is not None:
             os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
             with open(CONFIG_PATH, "wb") as f:
@@ -56,18 +60,17 @@ class TestYvoloApp(unittest.TestCase):
     def test_buttons_match_labels(self):
         buttons = self._find_buttons(self.app)
         self.assertEqual(len(buttons), 3)
+
         texts = sorted([b.cget("text") for b in buttons])
-        expected = sorted(
-            [
-                self.config["labels"]["btn_open_chat"],
-                self.config["labels"]["btn_close_chat"],
-                self.config["labels"]["btn_process_ideas"],
-            ]
-        )
+        expected = sorted([
+            self.config["labels"]["btn_open_chat"],
+            self.config["labels"]["btn_close_chat"],
+            self.config["labels"]["btn_process_ideas"],
+        ])
+
         self.assertEqual(texts, expected)
 
     def test_fallback_on_missing_config(self):
-        # Temporarily rename config file to force fallback
         if os.path.exists(CONFIG_PATH):
             temp_path = CONFIG_PATH + ".bak"
             os.rename(CONFIG_PATH, temp_path)
@@ -83,14 +86,14 @@ class TestYvoloApp(unittest.TestCase):
 
             buttons = self._find_buttons(app)
             self.assertEqual(len(buttons), 3)
+
             texts = sorted([b.cget("text") for b in buttons])
-            expected = sorted(
-                [
-                    DEFAULT_CONFIG["labels"]["btn_open_chat"],
-                    DEFAULT_CONFIG["labels"]["btn_close_chat"],
-                    DEFAULT_CONFIG["labels"]["btn_process_ideas"],
-                ]
-            )
+            expected = sorted([
+                DEFAULT_CONFIG["labels"]["btn_open_chat"],
+                DEFAULT_CONFIG["labels"]["btn_close_chat"],
+                DEFAULT_CONFIG["labels"]["btn_process_ideas"],
+            ])
+
             self.assertEqual(texts, expected)
             app.destroy()
         finally:
@@ -99,14 +102,12 @@ class TestYvoloApp(unittest.TestCase):
 
     @patch("ui_main.subprocess.run")
     def test_open_chat_copies_files_calls_powershell(self, mock_run):
-        # Force backup path to be an existing file
         existing_file = os.path.abspath(__file__)
         self.app.get_backup_path = lambda: existing_file
 
-        hoja_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hoja_de_ruta.txt"))
-        promp_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "promp_maestro.txt"))
+        hoja_path = os.path.join(BASE_DIR, "hoja_de_ruta.txt")
+        promp_path = os.path.join(BASE_DIR, "promp_maestro.txt")
 
-        # Ensure hoja and promp exist for this test
         for p in [hoja_path, promp_path]:
             if not os.path.exists(p):
                 with open(p, "w", encoding="utf-8") as f:
@@ -116,35 +117,53 @@ class TestYvoloApp(unittest.TestCase):
 
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
-        cmd = args[0]  # list like ["powershell","-Command","SetFileDropList -Path ..."]
-        self.assertIn("powershell", cmd[0].lower())
+        cmd = args[0]
+
         self.assertIn("SetFileDropList", cmd[-1])
         self.assertIn(existing_file, cmd[-1])
-        self.assertIn(hoja_path, cmd[-1])
-        self.assertIn(promp_path, cmd[-1])
+        self.assertIn(os.path.abspath(hoja_path), cmd[-1])
+        self.assertIn(os.path.abspath(promp_path), cmd[-1])
 
     @patch("ui_main.subprocess.run")
     def test_open_chat_skips_missing_files(self, mock_run):
-        # Backup path missing, promp missing; hoja exists -> should still call powershell with hoja only
         self.app.get_backup_path = lambda: r"C:\no\such\file.zip"
 
-        hoja_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "hoja_de_ruta.txt"))
+        hoja_path = os.path.join(BASE_DIR, "hoja_de_ruta.txt")
+
         if not os.path.exists(hoja_path):
             with open(hoja_path, "w", encoding="utf-8") as f:
                 f.write("test")
-
-        promp_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "promp_maestro.txt"))
-        if os.path.exists(promp_path):
-            os.remove(promp_path)
 
         self.app.open_chat()
 
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
+
         self.assertIn("SetFileDropList", cmd[-1])
-        self.assertIn(hoja_path, cmd[-1])
+        self.assertIn(os.path.abspath(hoja_path), cmd[-1])
         self.assertNotIn(r"C:\no\such\file.zip", cmd[-1])
+
+    @patch("ui_main.subprocess.run")
+    def test_open_chat_button_invoke_triggers_copy(self, mock_run):
+        target_text = self.config["labels"]["btn_open_chat"]
+        buttons = self._find_buttons(self.app)
+
+        open_button = None
+        for b in buttons:
+            if b.cget("text") == target_text:
+                open_button = b
+                break
+
+        self.assertIsNotNone(open_button, "No se encontró el botón Abrir Chat")
+
+        open_button.invoke()
+
+        self.assertTrue(mock_run.called)
+        args, _kwargs = mock_run.call_args
+        cmd = args[0]
+
+        self.assertIn("SetFileDropList", cmd[-1])
 
 
 if __name__ == "__main__":

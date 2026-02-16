@@ -53,6 +53,16 @@
   Implementada: Implementada
   Dependencias: Tarea 4
 
+- Descripción: Test de integración del botón ""Abrir Chat"":
+  - Encontrar el botón real por texto
+  - Simular click real con .invoke()
+  - Verificar que se ejecuta la acción de copia (mock subprocess.run)
+  - No tocar el portapapeles real
+  Archivos: tests/test_ui_main.py
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Tarea 5
+
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
@@ -60,5 +70,7 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_121154.zip
+backup: Desktop\backups\backup_yvolo_20260216_125254.zip
 --------------------------------------------------
+
+

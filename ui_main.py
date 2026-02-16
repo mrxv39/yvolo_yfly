@@ -1,4 +1,4 @@
-port tkinter as tk
+import tkinter as tk
 import json
 import os
 
