@@ -7,28 +7,28 @@ from pathlib import Path
 
 
 def is_frozen_exe() -> bool:
-    """
-    True si corre como .exe empaquetado (PyInstaller).
-    """
     return bool(getattr(sys, "frozen", False))
 
 
 def app_dir() -> Path:
     """
-    - Source: carpeta donde vive ui_main.py (raíz del repo)
-    - EXE: carpeta donde vive yvolo.exe
+    SOURCE:
+        carpeta raíz del repo
+
+    EXE (PyInstaller onefile):
+        sys._MEIPASS contiene los archivos embebidos
     """
     if is_frozen_exe():
+        # PyInstaller onefile extrae aquí los data files
+        if hasattr(sys, "_MEIPASS"):
+            return Path(sys._MEIPASS)
         return Path(sys.executable).resolve().parent
+
     # En source, este módulo está en core/, así que subimos un nivel
     return Path(__file__).resolve().parent.parent
 
 
 def appdata_dir() -> Path:
-    """
-    %APPDATA%\\yvolo en Windows.
-    Fallback: ~/.yvolo
-    """
     base = os.environ.get("APPDATA")
     if base:
         return Path(base) / "yvolo"
@@ -36,15 +36,8 @@ def appdata_dir() -> Path:
 
 
 def yvolo_root_file(filename: str) -> Path:
-    """
-    Archivo en la raíz del proyecto yvolo (source).
-    En EXE se asume modo portable: junto al exe.
-    """
     return app_dir() / filename
 
 
 def projects_base_dir() -> Path:
-    """
-    Carpeta estándar para proyectos: Desktop\\proyectos
-    """
     return Path.home() / "Desktop" / "proyectos"

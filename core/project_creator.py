@@ -158,4 +158,11 @@ def create_new_project(
         return True, f"Proyecto creado: {project_dir}"
 
     except Exception as e:
+        # rollback: if project folder was partially created, remove it
+        try:
+            if project_dir.exists():
+                import shutil
+                shutil.rmtree(project_dir, ignore_errors=True)
+        except Exception:
+            pass
         return False, f"Error creando proyecto: {e}"

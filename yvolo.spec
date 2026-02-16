@@ -5,7 +5,7 @@ a = Analysis(
     ['ui_main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('promp_maestro.txt', '.'), ('hoja_de_ruta.txt', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
