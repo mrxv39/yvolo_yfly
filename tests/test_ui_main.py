@@ -1,5 +1,4 @@
-# tests/test_ui_main.py
-
+# C:\Users\Usuario\Desktop\proyectos\yvolo\tests\test_ui_main.py
 import os
 import unittest
 import tkinter as tk
@@ -13,9 +12,7 @@ CONFIG_PATH = os.path.join(BASE_DIR, "config", "settings.json")
 
 
 class TestYvoloApp(unittest.TestCase):
-
     def setUp(self):
-        # Guardar config original si existe
         self._backup_config = None
         if os.path.exists(CONFIG_PATH):
             with open(CONFIG_PATH, "rb") as f:
@@ -31,7 +28,6 @@ class TestYvoloApp(unittest.TestCase):
         except Exception:
             pass
 
-        # Restaurar config original si existía
         if self._backup_config is not None:
             os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
             with open(CONFIG_PATH, "wb") as f:
@@ -59,25 +55,27 @@ class TestYvoloApp(unittest.TestCase):
 
     def test_buttons_match_labels(self):
         buttons = self._find_buttons(self.app)
-        self.assertEqual(len(buttons), 3)
+        self.assertEqual(len(buttons), 4)
 
         texts = sorted([b.cget("text") for b in buttons])
-        expected = sorted([
-            self.config["labels"]["btn_open_chat"],
-            self.config["labels"]["btn_close_chat"],
-            self.config["labels"]["btn_process_ideas"],
-        ])
-
+        expected = sorted(
+            [
+                self.config["labels"]["btn_open_chat"],
+                self.config["labels"]["btn_close_chat"],
+                self.config["labels"]["btn_process_ideas"],
+                self.config["labels"].get("btn_new_project", "Nuevo Proyecto"),
+            ]
+        )
         self.assertEqual(texts, expected)
 
     def test_fallback_on_missing_config(self):
-        if os.path.exists(CONFIG_PATH):
-            temp_path = CONFIG_PATH + ".bak"
-            os.rename(CONFIG_PATH, temp_path)
-        else:
-            temp_path = None
-
+        temp_path = None
+        app = None
         try:
+            if os.path.exists(CONFIG_PATH):
+                temp_path = CONFIG_PATH + ".bak"
+                os.rename(CONFIG_PATH, temp_path)
+
             config = load_config()
             app = YvoloApp(config=config)
             app.update()
@@ -85,20 +83,43 @@ class TestYvoloApp(unittest.TestCase):
             self.assertEqual(app.title(), DEFAULT_CONFIG["app_name"])
 
             buttons = self._find_buttons(app)
-            self.assertEqual(len(buttons), 3)
+            self.assertEqual(len(buttons), 4)
 
             texts = sorted([b.cget("text") for b in buttons])
-            expected = sorted([
-                DEFAULT_CONFIG["labels"]["btn_open_chat"],
-                DEFAULT_CONFIG["labels"]["btn_close_chat"],
-                DEFAULT_CONFIG["labels"]["btn_process_ideas"],
-            ])
-
+            expected = sorted(
+                [
+                    DEFAULT_CONFIG["labels"]["btn_open_chat"],
+                    DEFAULT_CONFIG["labels"]["btn_close_chat"],
+                    DEFAULT_CONFIG["labels"]["btn_process_ideas"],
+                    DEFAULT_CONFIG["labels"].get("btn_new_project", "Nuevo Proyecto"),
+                ]
+            )
             self.assertEqual(texts, expected)
-            app.destroy()
         finally:
+            if app is not None:
+                try:
+                    app.destroy()
+                except Exception:
+                    pass
             if temp_path and os.path.exists(temp_path):
                 os.rename(temp_path, CONFIG_PATH)
+
+    def test_nuevo_proyecto_button_exists_and_is_safe_to_invoke(self):
+        buttons = self._find_buttons(self.app)
+        label = self.config["labels"].get("btn_new_project", "Nuevo Proyecto")
+
+        btn = None
+        for b in buttons:
+            if b.cget("text") == label:
+                btn = b
+                break
+        self.assertIsNotNone(btn, "No se encontró el botón Nuevo Proyecto")
+
+        # No abrir diálogo real ni tocar disco
+        with patch.object(self.app, "open_new_project_dialog", return_value=None) as mocked:
+            btn.configure(command=self.app.open_new_project_dialog)
+            btn.invoke()
+            self.assertTrue(mocked.called)
 
     @patch("ui_main.subprocess.run")
     def test_open_chat_copies_files_calls_powershell(self, mock_run):
@@ -118,30 +139,29 @@ class TestYvoloApp(unittest.TestCase):
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
-
+        # El script está en cmd[-1]
         self.assertIn("SetFileDropList", cmd[-1])
-        self.assertIn(existing_file, cmd[-1])
-        self.assertIn(os.path.abspath(hoja_path), cmd[-1])
-        self.assertIn(os.path.abspath(promp_path), cmd[-1])
+        self.assertIn(existing_file.replace("'", "''"), cmd[-1])
+        self.assertIn(os.path.abspath(hoja_path).replace("'", "''"), cmd[-1])
+        self.assertIn(os.path.abspath(promp_path).replace("'", "''"), cmd[-1])
 
     @patch("ui_main.subprocess.run")
     def test_open_chat_skips_missing_files(self, mock_run):
         self.app.get_backup_path = lambda: r"C:\no\such\file.zip"
 
         hoja_path = os.path.join(BASE_DIR, "hoja_de_ruta.txt")
-
         if not os.path.exists(hoja_path):
             with open(hoja_path, "w", encoding="utf-8") as f:
                 f.write("test")
 
+        # promp puede existir o no; si no existe, se omitirá
         self.app.open_chat()
 
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
-
         self.assertIn("SetFileDropList", cmd[-1])
-        self.assertIn(os.path.abspath(hoja_path), cmd[-1])
+        self.assertIn(os.path.abspath(hoja_path).replace("'", "''"), cmd[-1])
         self.assertNotIn(r"C:\no\such\file.zip", cmd[-1])
 
     @patch("ui_main.subprocess.run")
@@ -158,11 +178,9 @@ class TestYvoloApp(unittest.TestCase):
         self.assertIsNotNone(open_button, "No se encontró el botón Abrir Chat")
 
         open_button.invoke()
-
         self.assertTrue(mock_run.called)
         args, _kwargs = mock_run.call_args
         cmd = args[0]
-
         self.assertIn("SetFileDropList", cmd[-1])
 
 
