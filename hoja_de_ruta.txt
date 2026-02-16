@@ -27,6 +27,19 @@
   Implementada: Implementada
   Dependencias: Tarea 2
 
+- Descripción: Botón "Abrir Chat" copia ARCHIVOS al portapapeles (como Explorer: clic derecho > Copiar):
+  - Obtener ruta del último backup leyendo hoja_de_ruta.txt (línea "backup:" en #ProyectoInfo)
+  - Copiar al portapapeles como lista de archivos (no texto) estos 3 elementos:
+    1) El zip del backup (ruta del punto anterior)
+    2) Desktop\proyectos\yvolo\hoja_de_ruta.txt
+    3) Desktop\proyectos\yvolo\promp_maestro.txt
+  - Si alguno no existe, no fallar; imprimir WARN y copiar los que existan
+  - Implementación: invocar PowerShell para poner FileDropList en el portapapeles
+  Archivos: ui_main.py, tests/test_ui_main.py
+  Critica: Critica
+  Implementada: Implementada
+  Dependencias: Tarea 3
+
 #Ideas
 - Versión inglesa "yfly" (EN) en el futuro cuando yvolo esté estable
 --------------------------------------------------
@@ -34,5 +47,5 @@
 
 repo_git: <URL_DEL_REPOSITORIO>
 name_project: yvolo
-backup: Desktop\backups\backup_yvolo_20260216_093432.zip
+backup: Desktop\backups\backup_yvolo_20260216_115825.zip
 --------------------------------------------------

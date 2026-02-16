@@ -26,6 +26,9 @@ def load_config():
         print(f"WARN: No se pudo cargar config/settings.json, usando valores por defecto. ({e})")
         return DEFAULT_CONFIG
 
+
+import subprocess
+
 class YvoloApp(tk.Tk):
     def __init__(self, config=None):
         super().__init__()
@@ -50,7 +53,7 @@ class YvoloApp(tk.Tk):
         button_pad = {'padx': 20, 'pady': 10}
         labels = config["labels"]
 
-        btn_abrir = tk.Button(frame, text=labels.get("btn_open_chat", DEFAULT_CONFIG["labels"]["btn_open_chat"]), width=20, command=lambda: print("Abrir Chat clicked"))
+        btn_abrir = tk.Button(frame, text=labels.get("btn_open_chat", DEFAULT_CONFIG["labels"]["btn_open_chat"]), width=20, command=self.open_chat)
         btn_abrir.pack(**button_pad)
 
         btn_cerrar = tk.Button(frame, text=labels.get("btn_close_chat", DEFAULT_CONFIG["labels"]["btn_close_chat"]), width=20, command=lambda: print("Cerrar Chat clicked"))
@@ -58,6 +61,42 @@ class YvoloApp(tk.Tk):
 
         btn_procesar = tk.Button(frame, text=labels.get("btn_process_ideas", DEFAULT_CONFIG["labels"]["btn_process_ideas"]), width=20, command=lambda: print("Procesar Ideas clicked"))
         btn_procesar.pack(**button_pad)
+
+    def get_backup_path(self) -> str:
+        hoja_path = os.path.join(os.path.dirname(__file__), "hoja_de_ruta.txt")
+        try:
+            with open(hoja_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    if line.strip().startswith("backup:"):
+                        return line.split("backup:", 1)[1].strip()
+        except Exception as e:
+            print(f"WARN: No se pudo leer hoja_de_ruta.txt para backup: {e}")
+        return ""
+
+    def copy_files_to_clipboard(self, paths: list[str]) -> None:
+        existing = [os.path.abspath(p) for p in paths if os.path.isfile(p)]
+        if not existing:
+            print("WARN: No files to copy")
+            return
+        # PowerShell Set-Clipboard -Path ...
+        try:
+            cmd = [
+                "powershell",
+                "-Command",
+                "Set-Clipboard -Path {}".format(','.join(f'\"{p}\"' for p in existing))
+            ]
+            subprocess.run(cmd, check=True)
+            print("Archivos copiados al portapapeles")
+        except Exception as e:
+            print(f"WARN: No se pudo copiar archivos al portapapeles: {e}")
+
+    def open_chat(self):
+        # Build list: backup, hoja_de_ruta.txt, promp_maestro.txt
+        backup_path = self.get_backup_path()
+        hoja_path = os.path.join(os.path.dirname(__file__), "hoja_de_ruta.txt")
+        promp_path = os.path.join(os.path.dirname(__file__), "promp_maestro.txt")
+        files = [backup_path, hoja_path, promp_path]
+        self.copy_files_to_clipboard(files)
 
 if __name__ == "__main__":
     app = YvoloApp()
